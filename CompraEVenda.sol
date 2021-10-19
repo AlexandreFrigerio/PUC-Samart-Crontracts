@@ -8,11 +8,11 @@ contract CompraEVenda {
     string cartorio;
     string dataDeVencimento;
     bool quitado = false;
-    uint valorTotal;
-    uint valorDaEntrada;
-    uint valorEmAberto;
-    uint quntidadeDeParcelas;
-    uint valorDaParcela;
+    uint public valorTotal = 100000;
+    uint public valorDaEntrada;
+    uint public valorEmAberto;
+    uint public quntidadeDeParcelas;
+    uint public valorDaParcela;
     uint porcentagemDaMulta;
     
     function pagarEntrada(uint _valorPagamento) public returns(uint, string memory){
