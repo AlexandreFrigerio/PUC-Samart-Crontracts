@@ -2,10 +2,12 @@ pragma solidity 0.8.9;
 
 contract CompraEVenda {
     // Autor: Alexandre
-    string comprador;
-    string vendedor;
+    address public comprador;
+    address public vendedor;
+    
     string public matricula;
     string public cartorio;
+    
     string dataDeVencimento;
     
     bool quitado = false;
@@ -26,6 +28,7 @@ contract CompraEVenda {
    
         )
     {
+        vendedor = msg.sender;
         valorTotal = _valorTotal;
         valorDaEntrada = _valorDaEntrada;
         quntidadeDeParcelas = _quantidadeDeParcelas;
@@ -39,12 +42,18 @@ contract CompraEVenda {
     
     
     function pagarEntrada(uint _valorPagamento) public returns(uint, string memory){
+        require(_valorPagamento == valorDaEntrada, "valor de entrada incorreto");
+        require(valorEmAberto == valorTotal, "Entrada ja foi paga.");
+        comprador = msg.sender;
         valorEmAberto = valorTotal - _valorPagamento;
         return(valorEmAberto, "valor em aberto");
     }
     
-    function pagarParcela(uint _valorDaParcela) public returns(uint, string memory){
-        valorEmAberto = valorEmAberto - _valorDaParcela;
+    function pagarParcela(uint _valorPagamento) public returns(uint, string memory){
+        require(_valorPagamento == valorDaParcela, "Valor da parcela incorreto");
+        require(valorEmAberto <= valorTotal-valorDaEntrada, "Entrada nao foi paga.");
+        require(comprador == msg.sender, "Obrigado, somente o coprador pode executar essa funcao");
+        valorEmAberto = valorEmAberto - _valorPagamento;
         return(valorEmAberto, "valor em aberto");
         }
     
@@ -59,3 +68,5 @@ contract CompraEVenda {
     }
     
 }
+
+
