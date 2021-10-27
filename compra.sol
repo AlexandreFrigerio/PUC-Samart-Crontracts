@@ -8,7 +8,7 @@ contract CompraEVenda {
     string public matricula;
     string public cartorio;
     
-    string dataDeVencimento;
+    uint public dataDeVencimento;
     
     bool quitado = false;
     
@@ -24,20 +24,19 @@ contract CompraEVenda {
         uint _valorDaEntrada,
         uint _quantidadeDeParcelas,
         string memory _matricula,
-        string memory _cartorio
+        string memory _cartorio,
+        address _vendedor
    
         )
     {
-        vendedor = msg.sender;
+        vendedor = _vendedor;
         valorTotal = _valorTotal;
         valorDaEntrada = _valorDaEntrada;
         quntidadeDeParcelas = _quantidadeDeParcelas;
         matricula = _matricula;
         cartorio = _cartorio;
         valorEmAberto = _valorTotal;
-        valorDaParcela = funcaovalorParcela();
-        
-        
+        valorDaParcela = funcaoValorParcela();
     }
     
     
@@ -46,6 +45,7 @@ contract CompraEVenda {
         require(valorEmAberto == valorTotal, "Entrada ja foi paga.");
         comprador = msg.sender;
         valorEmAberto = valorTotal - _valorPagamento;
+        dataDeVencimento = block.timestamp + 31 * 86400;
         return(valorEmAberto, "valor em aberto");
     }
     
@@ -53,20 +53,26 @@ contract CompraEVenda {
         require(_valorPagamento == valorDaParcela, "Valor da parcela incorreto");
         require(valorEmAberto <= valorTotal-valorDaEntrada, "Entrada nao foi paga.");
         require(comprador == msg.sender, "Obrigado, somente o coprador pode executar essa funcao");
+        require(block.timestamp <= dataDeVencimento, "Parcela com data de vencimento vencida");
+        dataDeVencimento = dataDeVencimento + 31 * 86400;
         valorEmAberto = valorEmAberto - _valorPagamento;
         return(valorEmAberto, "valor em aberto");
         }
     
-    function funcaovalorParcela() public view returns (uint){
+    function funcaoValorParcela() public view returns (uint){
         uint calculoValorParcela = (valorTotal - valorDaEntrada)/quntidadeDeParcelas;
         return(calculoValorParcela);
     }
     
     function valorDaMulta(uint _porcentagemDaMulta) public view returns (uint, string memory){
+        require(comprador == msg.sender || vendedor == msg.sender, "Apenas o comprador ou vendedor podem executar");
         uint multa = (_porcentagemDaMulta*valorTotal)/100;
         return(multa, "valor da multa");
     }
     
 }
+
+
+
 
 
