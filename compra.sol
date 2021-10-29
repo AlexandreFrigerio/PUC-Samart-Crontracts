@@ -55,9 +55,9 @@ contract CompraEVenda {
         require(valorEmAberto <= valorTotal-valorDaEntrada, "Entrada nao foi paga.");
         require(comprador == msg.sender, "Obrigado, somente o coprador pode executar essa funcao");
         require(block.timestamp <= dataDeVencimento, "Parcela com data de vencimento vencida");
+        payable(vendedor).transfer(msg.value);
         dataDeVencimento = dataDeVencimento + 31 * 86400;
         valorEmAberto = valorEmAberto - msg.value;
-        payable(vendedor).transfer(msg.value);
         return(valorEmAberto, "valor em aberto");
         }
     
