@@ -40,22 +40,24 @@ contract CompraEVenda {
     }
     
     
-    function pagarEntrada(uint _valorPagamento) public returns(uint, string memory){
-        require(_valorPagamento == valorDaEntrada, "valor de entrada incorreto");
+    function pagarEntrada() public payable returns(uint, string memory){
+        require(msg.value == valorDaEntrada, "valor de entrada incorreto");
         require(valorEmAberto == valorTotal, "Entrada ja foi paga.");
         comprador = msg.sender;
-        valorEmAberto = valorTotal - _valorPagamento;
+        payable(vendedor).transfer(msg.value);
+        valorEmAberto = valorTotal - msg.value;
         dataDeVencimento = block.timestamp + 31 * 86400;
         return(valorEmAberto, "valor em aberto");
     }
     
-    function pagarParcela(uint _valorPagamento) public returns(uint, string memory){
-        require(_valorPagamento == valorDaParcela, "Valor da parcela incorreto");
+    function pagarParcela() public payable returns(uint, string memory){
+        require(msg.value == valorDaParcela, "Valor da parcela incorreto");
         require(valorEmAberto <= valorTotal-valorDaEntrada, "Entrada nao foi paga.");
         require(comprador == msg.sender, "Obrigado, somente o coprador pode executar essa funcao");
         require(block.timestamp <= dataDeVencimento, "Parcela com data de vencimento vencida");
         dataDeVencimento = dataDeVencimento + 31 * 86400;
-        valorEmAberto = valorEmAberto - _valorPagamento;
+        valorEmAberto = valorEmAberto - msg.value;
+        payable(vendedor).transfer(msg.value);
         return(valorEmAberto, "valor em aberto");
         }
     
@@ -70,8 +72,7 @@ contract CompraEVenda {
         return(multa, "valor da multa");
     }
     
-}
-
+} 
 
 
 
