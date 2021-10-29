@@ -26,8 +26,8 @@ contract MeuContrato {
 
     function sacar(uint value) public {
         require(value <= balance, "Saldo Insuficiente");
-        payable(vendedor).transfer(value);
         balance = balance - value;
+        payable(vendedor).transfer(value);
     }
 
     function verSaldo() public view returns(uint){
